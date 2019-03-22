@@ -15,8 +15,16 @@ if [[ ${DEBUG_LOGGING} == true ]]
 fi
 
 # Chown the nexus data directory
-chown nexus:nexus "${NEXUS_DATA}"
-chown -R nexus:nexus $(ls ${NEXUS_DATA} | awk -v NEXUS_DATA="${NEXUS_DATA}/" '{if($1 != "blobs"){ print NEXUS_DATA$1 }}')
+chown nexus:nexus ${NEXUS_DATA}
+
+NEXUS_DATA_LS=$(ls "${NEXUS_DATA}" | awk -v NEXUS_DATA="${NEXUS_DATA}/" '{if($1 != "blobs"){ print NEXUS_DATA$1 }}')
+
+if [ -z "${NEXUS_DATA_LS}" ]
+then
+  echo "no chown needed for nexus-data directory"
+else
+  chown -R nexus:nexus ${NEXUS_DATA_LS}
+fi
 
 if [ ! -f ${NEXUS_DATA}/current_local_password ]; then
   echo admin123 > ${NEXUS_DATA}/current_local_password
